@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  imagen_service:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./frames:/app/frames
+      - ./generated:/app/generated
