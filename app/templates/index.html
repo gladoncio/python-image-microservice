@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Generar GIF con Avatar</title>
+<style>
+  /* Reset y tipografía */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    background: #121212;
+    color: #eee;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+  h1 {
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  form {
+    background: #1f1f1f;
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 0 15px rgb(255 255 255 / 0.1);
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+    margin-bottom: 1.1rem;
+    font-size: 1rem;
+  }
+.color-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+input[type="color"] {
+  width: 40px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: none;
+  -webkit-appearance: none;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border-radius: 6px;
+  border: 1px solid #555;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="color"],
+select {
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  border: none;
+  font-size: 1rem;
+  background: #2c2c2c;
+  color: #eee;
+  transition: background-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="color"]:focus,
+select:focus {
+  outline: none;
+  background: #444;
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 0.75rem 0;
+  background: linear-gradient(135deg, #4c8bf5, #2245f5);
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+button[type="submit"]:hover,
+button[type="submit"]:focus {
+  background: linear-gradient(135deg, #2245f5, #4c8bf5);
+  outline: none;
+}
+
+#result {
+  margin-top: 2rem;
+  max-width: 480px;
+  width: 100%;
+  word-break: break-word;
+}
+
+#result pre {
+  background: #222;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  user-select: all;
+  white-space: pre-wrap;
+}
+
+#result img {
+  display: block;
+  max-width: 100%;
+  margin-top: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+}
+
+#result button {
+  margin-top: 1rem;
+  padding: 0.5rem 1.3rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #f5a623;
+  color: #121212;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+#result button:hover,
+#result button:focus {
+  background-color: #d48806;
+  outline: none;
+}
+
+/* Vista previa de fuente */
+#fontPreviewContainer {
+  margin-top: 1rem;
+  background:#222;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  color: #eee;
+}
+
+#fontPreviewLabel {
+  font-weight: 700;
+}
+
+#fontPreview {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #1f1f1f;
+  border-radius: 6px;
+  min-height: 50px;
+  outline: none;
+  user-select: text;
+}
+
+/* Fuentes cargadas dinámicamente */
+{% for font in fonts %}
+@font-face {
+  font-family: "{{ font }}";
+  src: url("/fonts/{{ font }}") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+{% endfor %}
+
+@media (max-width: 520px) {
+  form {
+    padding: 1rem 1.2rem;
+  }
+  label {
+    font-size: 0.95rem;
+  }
+  button[type="submit"] {
+    font-size: 1rem;
+    padding: 0.65rem 0;
+  }
+}
+</style>
+</head>
+<body>
+  <h1>Generar GIF con Avatar</h1>
+  <form id="gifForm" autocomplete="off" spellcheck="false">
+    <label>GIF URL:
+      <input type="text" name="gif_url" required
+        value="https://wallpapercast.com/media/81c33cf4-9d80-4cf0-abf1-110ef032c713/fba53ad9-b1ec-4c89-aa1e-40873a861268.gif"
+      />
+    </label>
+    <label>Avatar URL:
+      <input type="text" name="avatar_url" required
+        value="https://cdn.discordapp.com/avatars/687173922512437301/529ab0624bd6b8284a1a9ac4a901175b.png?size=1024"
+      />
+    </label>
+    <label>Texto:
+      <input type="text" name="text" placeholder="Texto para el GIF (opcional)" />
+    </label>
+    <label>Color:
+      <div class="color-container">
+        <input type="color" id="colorPicker" value="#ffffff" />
+        <span id="rgbValue" style="font-family: monospace; user-select: none;">255,255,255</span>
+      </div>
+      <input type="hidden" name="color" id="colorValue" value="255,255,255" />
+    </label>
+    <label>Tamaño texto:
+      <input type="number" name="text_size" min="10" max="150" value="40" />
+    </label>
+    <label>Fuente:
+      <select id="fontSelect" name="font">
+        {% for font in fonts %}
+          <option value="{{ font }}">{{ font }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <div id="fontPreviewContainer">
+      <label id="fontPreviewLabel" for="fontPreview">Vista previa de la fuente seleccionada:</label>
+      <div id="fontPreview" contenteditable="true" spellcheck="false">Texto de ejemplo para probar la fuente</div>
+    </div>
+
+    <button type="submit">Generar</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    const colorPicker = document.getElementById('colorPicker');
+    const colorValue = document.getElementById('colorValue');
+    const rgbValueSpan = document.getElementById('rgbValue');
+    const fontSelect = document.getElementById('fontSelect');
+    const fontPreview = document.getElementById('fontPreview');
+
+    function hexToRgb(hex) {
+      const bigint = parseInt(hex.replace('#',''), 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `${r},${g},${b}`;
+    }
+
+    function updateColorDisplay() {
+      const rgb = hexToRgb(colorPicker.value);
+      colorValue.value = rgb;
+      rgbValueSpan.textContent = rgb;
+    }
+
+    function updateFontPreview() {
+      const selectedFont = fontSelect.value;
+      fontPreview.style.fontFamily = `"${selectedFont}", monospace, sans-serif`;
+    }
+
+    colorPicker.addEventListener('input', updateColorDisplay);
+    fontSelect.addEventListener('change', updateFontPreview);
+
+    updateColorDisplay();
+    updateFontPreview();
+
+    document.getElementById('gifForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+      const params = new URLSearchParams();
+      for (const [key, value] of formData.entries()) {
+        params.append(key, value);
+      }
+
+      const url = `${window.location.origin}/gif-avatar?${params.toString()}`;
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '';
+
+      const pre = document.createElement('pre');
+      pre.textContent = `curl "${url}"`;
+      resultDiv.appendChild(pre);
+
+      try {
+        const resp = await fetch(url);
+        const data = await resp.json();
+
+        if (data.url) {
+          const img = document.createElement('img');
+          img.src = data.url;
+          resultDiv.appendChild(img);
+
+          const btn = document.createElement('button');
+          btn.textContent = 'Ver en grande';
+          btn.onclick = () => window.open(data.url, '_blank');
+          resultDiv.appendChild(btn);
+        } else {
+          const errorDiv = document.createElement('div');
+          errorDiv.style.color = 'tomato';
+          errorDiv.style.marginTop = '1rem';
+          errorDiv.textContent = `Error: ${data.error || 'Error desconocido'}`;
+          resultDiv.appendChild(errorDiv);
+        }
+      } catch (err) {
+        const errorDiv = document.createElement('div');
+        errorDiv.style.color = 'tomato';
+        errorDiv.style.marginTop = '1rem';
+        errorDiv.textContent = 'Error en la conexión o respuesta del servidor';
+        resultDiv.appendChild(errorDiv);
+      }
+    });
+  </script>
+</body>
+</html>
