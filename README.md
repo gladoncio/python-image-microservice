@@ -50,6 +50,7 @@ curl "http://127.0.0.1:5000/gif-avatar?gif_url=https%3A%2F%2Fmedia1.tenor.com%2F
 ## 📸 Imagen de ejemplo
 
 ![Imagen muestra](/captura/muestra.png)
+![Imagen muestra](/captura/example.gif)
 
 
 puedes visualizar una imagen de ejemplo almacenada en la carpeta `captura` con el nombre `muestra`.
